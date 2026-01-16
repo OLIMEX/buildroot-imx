@@ -1074,7 +1074,7 @@ index 0000000..a340f64
 +
 +	pinctrl_csi1_en: csi1_en_grp {
 +		fsl,pins = <
-+			+MX8MP_IOMUXC_GPIO1_IO06__GPIO1_IO06		0x10
++			MX8MP_IOMUXC_GPIO1_IO06__GPIO1_IO06		0x10
 +		>;
 +	};
 +};
