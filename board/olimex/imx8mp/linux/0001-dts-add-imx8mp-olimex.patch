@@ -3,7 +3,7 @@ new file mode 100644
 index 0000000..a340f64
 --- /dev/null
 +++ b/arch/arm64/boot/dts/freescale/imx8mp-olimex.dts
-@@ -0,0 +1,1160 @@
+@@ -0,0 +1,1168 @@
 +// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 +/*
 + * Copyright 2019 NXP
@@ -55,27 +55,37 @@ index 0000000..a340f64
 +		regulator-name = "audio-pwr";
 +		regulator-min-microvolt = <3300000>;
 +		regulator-max-microvolt = <3300000>;
-+		gpio = <&gpio4 29 GPIO_ACTIVE_HIGH>;
 +		enable-active-high;
 +		regulator-always-on;
 +	};
 +
-+	     sound {
-+                compatible = "fsl,imx-audio-es8328";
-+                model = "imx-audio-es8328";
-+                audio-codec = <&codec>;
-+                audio-routing =
-+                        "Speaker", "LOUT2",
-+                        "Speaker", "ROUT2",
-+                        "Speaker", "audio-amp",
-+                        "Headphone", "ROUT1",
-+                        "Headphone", "LOUT1",
-+                        "LINPUT1", "Mic Jack",
-+                        "RINPUT1", "Mic Jack",
-+                        "Mic Jack", "Mic Bias";
-+                mux-int-port = <0x1>;
-+                mux-ext-port = <0x3>;
-+        };
++	sound-es8328 {
++	    compatible = "simple-audio-card";
++	    simple-audio-card,name = "imx-es8328";
++	    simple-audio-card,format = "i2s";
++	    simple-audio-card,bitclock-master = <&cpu_dai>;
++	    simple-audio-card,frame-master = <&cpu_dai>;
++	    simple-audio-card,widgets =
++	        "Speaker", "Speaker",
++	        "Headphone", "Headphone",
++	        "Microphone", "Mic Jack";
++	    simple-audio-card,routing =
++	        "Speaker", "LOUT2",
++	        "Speaker", "ROUT2",
++	        "Headphone", "ROUT1",
++	        "Headphone", "LOUT1",
++	        "LINPUT1", "Mic Jack",
++	        "RINPUT1", "Mic Jack",
++	        "Mic Jack", "Mic Bias";
++	
++	    cpu_dai: simple-audio-card,cpu {
++	        sound-dai = <&sai3>;
++	    };
++	
++	    simple-audio-card,codec {
++	        sound-dai = <&codec>;
++	    };
++	};
 +
 +
 +	sound-hdmi {
@@ -444,13 +454,11 @@ index 0000000..a340f64
 +	pinctrl-0 = <&pinctrl_i2c3>;
 +	status = "okay";
 +
-+	  codec: es8328@11 {
++	  codec: es8328@10 {
 +                compatible = "everest,es8328";
-+                reg = <0x11>;
-+        /*        DVDD-supply = <&reg_audio_codec>;
-+                AVDD-supply = <&reg_audio_codec>;
-+                PVDD-supply = <&reg_audio_codec>;
-+                HPVDD-supply = <&reg_audio_codec>;*/
++                reg = <0x10>;
++                #sound-dai-cells = <0>;
++                clock-names = "mclk";
 +                clocks = <&audio_blk_ctrl IMX8MP_CLK_AUDIO_BLK_CTRL_SAI3_MCLK1>;
 +        };
 +
@@ -595,12 +603,13 @@ index 0000000..a340f64
 +};
 +*/
 +&sai3 {
++	#sound-dai-cells = <0>;
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&pinctrl_sai3>;
-+	assigned-clocks = <&clk IMX8MP_CLK_SAI3>;
++	assigned-clocks = <&clk IMX8MP_CLK_SAI3>, <&clk IMX8MP_AUDIO_PLL1_OUT>, <&clk IMX8MP_AUDIO_PLL2_OUT>;
 +	assigned-clock-parents = <&clk IMX8MP_AUDIO_PLL1_OUT>;
-+	assigned-clock-rates = <12288000>;
-+	clocks = <&audio_blk_ctrl IMX8MP_CLK_AUDIO_BLK_CTRL_SAI3_IPG>, <&clk IMX8MP_CLK_DUMMY>,
++	assigned-clock-rates = <12288000>, <393216000>, <361267200>;
++	clocks = <&audio_blk_ctrl IMX8MP_CLK_AUDIO_BLK_CTRL_SAI3_IPG>, <&clk IMX8MP_CLK_24M>,
 +		 <&audio_blk_ctrl IMX8MP_CLK_AUDIO_BLK_CTRL_SAI3_MCLK1>, <&clk IMX8MP_CLK_DUMMY>,
 +		 <&clk IMX8MP_CLK_DUMMY>;
 +	clock-names = "bus", "mclk0", "mclk1", "mclk2", "mclk3";
@@ -910,8 +919,7 @@ index 0000000..a340f64
 +			MX8MP_IOMUXC_SAI3_RXD__AUDIOMIX_SAI3_RX_DATA00	0xd6
 +			MX8MP_IOMUXC_SAI3_TXD__AUDIOMIX_SAI3_TX_DATA00	0xd6
 +			MX8MP_IOMUXC_SAI3_MCLK__AUDIOMIX_SAI3_MCLK	0xd6
-+			MX8MP_IOMUXC_SAI3_RXFS__GPIO4_IO28		0xd6
-+			MX8MP_IOMUXC_SAI3_RXC__GPIO4_IO29		0xd6
++			MX8MP_IOMUXC_SAI3_RXFS__AUDIOMIX_SAI3_RX_SYNC   0xd6
 +		>;
 +	};
 +
@@ -1164,3 +1172,4 @@ index 0000000..a340f64
 +		status = "okay";
 +	};
 +};
+
