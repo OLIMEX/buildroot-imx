@@ -3,7 +3,7 @@ new file mode 100644
 index 0000000..a340f64
 --- /dev/null
 +++ b/arch/arm64/boot/dts/freescale/imx8mp-olimex.dts
-@@ -0,0 +1,1160 @@
+@@ -0,0 +1,1168 @@
 +// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 +/*
 + * Copyright 2019 NXP
@@ -20,6 +20,14 @@ index 0000000..a340f64
 +
 +	chosen {
 +		stdout-path = &uart2;
++	};
++
++	aliases {
++		spi1 = &ecspi1;
++		spi2 = &ecspi2;
++		spi3 = &ecspi3;
++		can0 = &flexcan1;
++		can1 = &flexcan2;
 +	};
 +
 +	gpio-leds {
